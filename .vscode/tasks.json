@@ -1,0 +1,52 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Compile CoopManager",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "$ErrorActionPreference = 'Stop'; New-Item -ItemType Directory -Force -Path 'build/classes' | Out-Null; $Sources = Get-ChildItem -Path 'src' -Recurse -Filter '*.java' | Sort-Object FullName | ForEach-Object { $_.FullName }; javac -encoding UTF-8 -d 'build/classes' $Sources"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "Run CoopManager",
+      "type": "shell",
+      "command": "java",
+      "args": [
+        "-cp",
+        "build/classes;lib/*",
+        "Main"
+      ],
+      "dependsOn": "Compile CoopManager",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build CoopManager EXE",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/build-exe.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "problemMatcher": "$javac"
+    }
+  ]
+}

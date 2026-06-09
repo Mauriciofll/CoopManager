@@ -1,0 +1,33 @@
+apply plugin: "com.android.application"
+
+android {
+    namespace "br.com.coopmanager.mobile"
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "br.com.coopmanager.mobile"
+        minSdk 23
+        targetSdk 36
+        versionCode 1
+        versionName "1.0"
+    }
+}
+
+def generatedAssetsDir = layout.buildDirectory.dir("generated/mobileAssets").get().asFile
+
+tasks.register("syncMobileAssets", Copy) {
+    from("${rootDir}/../mobile") {
+        into "mobile"
+    }
+    from("${rootDir}/../assets") {
+        include "CoopManager.png"
+        into "assets"
+    }
+    into generatedAssetsDir
+}
+
+android.sourceSets.main.assets.srcDir(generatedAssetsDir)
+
+tasks.named("preBuild").configure {
+    dependsOn("syncMobileAssets")
+}

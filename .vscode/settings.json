@@ -1,0 +1,10 @@
+{
+  "java.project.sourcePaths": [
+    "src"
+  ],
+  "java.project.outputPath": "build/classes",
+  "java.import.maven.enabled": false,
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.debug.settings.console": "internalConsole",
+  "java.debug.settings.onBuildFailureProceed": false
+}

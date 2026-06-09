@@ -2,9 +2,11 @@ package view;
 
 import controller.PedidoController;
 import controller.ProdutoController;
+import model.Cliente;
 import model.Pedido;
 import model.Produto;
 import model.Usuario;
+import repository.ClienteRepository;
 import repository.PedidoRepository;
 import repository.ProdutoRepository;
 import repository.UsuarioRepository;
@@ -15,6 +17,7 @@ public class MainConsoleView {
     private Scanner scanner = new Scanner(System.in);
 
     private UsuarioRepository usuarioRepository = new UsuarioRepository();
+    private ClienteRepository clienteRepository = new ClienteRepository();
     private ProdutoRepository produtoRepository = new ProdutoRepository();
     private PedidoRepository pedidoRepository = new PedidoRepository();
 
@@ -26,8 +29,8 @@ public class MainConsoleView {
 
         int opcao;
         do {
-            System.out.println("\n=== Sistema de Gestao Cooperativa ===");
-            System.out.println("1 - Listar catalogo de produtos");
+            System.out.println("\n=== Sistema de Gestão Cooperativa ===");
+            System.out.println("1 - Listar catálogo de produtos");
             System.out.println("2 - Cadastrar produto");
             System.out.println("3 - Criar pedido");
             System.out.println("4 - Listar pedidos");
@@ -44,23 +47,27 @@ public class MainConsoleView {
                 case 4 -> listarPedidos();
                 case 5 -> atualizarStatusPedido();
                 case 0 -> System.out.println("Encerrando...");
-                default -> System.out.println("Opcao invalida.");
+                default -> System.out.println("Opção inválida.");
             }
         } while (opcao != 0);
     }
 
     private void carregarDadosExemplo() {
-        Usuario cassiano = usuarioRepository.salvar("Cassiano", "ADMIN");
-        Usuario produtor1 = usuarioRepository.salvar("Produtor da Agricultura", "PRODUTOR");
-        Usuario produtor2 = usuarioRepository.salvar("Artesao Associado", "PRODUTOR");
-        usuarioRepository.salvar("Cliente Exemplo", "CLIENTE");
+        if (!usuarioRepository.estaVazio()) {
+            return;
+        }
+
+        usuarioRepository.salvar("Cassiano", "ADMIN");
+        Usuario produtor1 = usuarioRepository.salvar("Produtor da Agricultura", "PRODUTOR", "agricultura", "agro123");
+        Usuario produtor2 = usuarioRepository.salvar("Artesão Associado", "PRODUTOR", "artesao", "arte123");
+        clienteRepository.salvar("Cliente Exemplo");
 
         produtoController.cadastrarProduto("Cesta de verduras", "AGRICULTURA", 35.00, 10, produtor1);
         produtoController.cadastrarProduto("Pano de prato artesanal", "ARTESANATO", 22.50, 8, produtor2);
     }
 
     private void listarProdutos() {
-        System.out.println("\n--- Catalogo Digital ---");
+        System.out.println("\n--- Catálogo Digital ---");
         for (Produto produto : produtoController.listarProdutos()) {
             System.out.println(produto);
         }
@@ -73,7 +80,7 @@ public class MainConsoleView {
         System.out.print("Categoria: ");
         String categoria = scanner.nextLine();
 
-        System.out.print("Preco: ");
+        System.out.print("Preço: ");
         double preco = scanner.nextDouble();
 
         System.out.print("Estoque: ");
@@ -93,7 +100,7 @@ public class MainConsoleView {
 
         Usuario produtor = usuarioRepository.buscarPorId(produtorId);
         if (produtor == null || !produtor.getTipo().equals("PRODUTOR")) {
-            System.out.println("Produtor invalido.");
+            System.out.println("Produtor inválido.");
             return;
         }
 
@@ -102,7 +109,9 @@ public class MainConsoleView {
     }
 
     private void criarPedido() {
-        Usuario cliente = usuarioRepository.buscarPorId(4); // cliente exemplo
+        Cliente cliente = clienteRepository.listarTodos().isEmpty()
+                ? clienteRepository.salvar("Cliente Exemplo")
+                : clienteRepository.listarTodos().get(0);
 
         System.out.print("Tipo de entrega (RETIRADA/ENTREGA): ");
         String tipoEntrega = scanner.nextLine();
@@ -123,7 +132,7 @@ public class MainConsoleView {
         if (sucesso) {
             System.out.println("Pedido criado com sucesso: " + pedido);
         } else {
-            System.out.println("Nao foi possivel criar o pedido. Verifique o estoque.");
+            System.out.println("Não foi possível criar o pedido. Verifique o estoque.");
         }
     }
 
@@ -143,14 +152,14 @@ public class MainConsoleView {
         int pedidoId = scanner.nextInt();
         scanner.nextLine();
 
-        System.out.println("Status disponiveis: PENDENTE, EM_SEPARACAO, PRONTO, FINALIZADO");
+        System.out.println("Status disponíveis: AGUARDANDO_PRODUTORES, PARCIALMENTE_RECEBIDO, PENDENCIA, EM_SEPARACAO, PRONTO, ENTREGUE");
         System.out.print("Novo status: ");
         String novoStatus = scanner.nextLine();
 
         if (pedidoController.atualizarStatus(pedidoId, novoStatus)) {
             System.out.println("Status atualizado.");
         } else {
-            System.out.println("Pedido nao encontrado.");
+            System.out.println("Pedido não encontrado.");
         }
     }
 }

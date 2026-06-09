@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Run CoopManager",
+      "request": "launch",
+      "mainClass": "Main",
+      "classPaths": [
+        "${workspaceFolder}/build/classes",
+        "${workspaceFolder}/lib/*.jar"
+      ],
+      "preLaunchTask": "Compile CoopManager",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole"
+    }
+  ]
+}
